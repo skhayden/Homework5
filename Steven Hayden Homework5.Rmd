@@ -1,0 +1,86 @@
+---
+title: "Homework5"
+author: "Steven Hayden"
+date: "September 28, 2017"
+output: 
+  html_document:
+    keep_md: true
+---
+# Question 1
+
+Import yob2016 and input into a datafram with three columns.
+
+```{r, echo=TRUE}
+ setwd("~/GitHub/SMU/Doing_Data_Science_1/Homework/Unit 5")
+df<- read.table("yob2016.txt",sep = ";",header = FALSE,col.names = c("FirstName","Gender","AmountofChildren"))
+```
+Summary
+```{r, echo=TRUE}
+summary(df)
+```
+Size
+```{r, echo=TRUE}
+dim(df)
+```
+Class
+```{r, echo=TRUE}
+class(df)
+```
+finds the row with the misspelled name and removes it
+
+```{r, echo=TRUE}
+
+df[grep('yyy',df$FirstName),]
+
+#removes the bad observation and put the altered df into a new one. 
+y2016<-df[-grep('yyy',df$FirstName),]
+
+```
+
+# Question 2
+
+```{r, echo=TRUE}
+ setwd("~/GitHub/SMU/Doing_Data_Science_1/Homework/Unit 5")
+y2015<- read.table("yob2015.txt",sep = ",",header = FALSE,col.names = c("FirstName","Gender","AmountofChildren"))
+tail(y2015,10)
+
+```
+###2b
+The last 10 names only have 5. There is no variantion in count. 
+
+###2c
+merge the two data sets together
+```{r, echo=TRUE}
+ final<- merge(y2015,df, by.x = c("FirstName","Gender"), by.y =c("FirstName","Gender"),all =  FALSE)
+names(final)<-c("FirstName","Gender","AmountofChildren.2015","AmountofChildren.2016")
+
+
+```
+# Question 3
+*Adds the count of children together into a new column. Total
+
+*orders the name by most popular for both male and female
+
+
+```{r, echo=TRUE}
+Total<- final$AmountofChildren.2015 + final$AmountofChildren.2016
+ final<-cbind(Total,final)
+ final<-final[order(-final$Total),c("FirstName","Gender","AmountofChildren.2015","AmountofChildren.2016","Total")]
+ head(final,10)
+
+```
+
+*Gives total number of names given in 2015 and 2016
+
+```{r, echo=TRUE} 
+sum(Total,na.rm = TRUE)
+```
+
+Top ten for Females only and puts it into a new object. The list is then saved to a csv
+```{r, echo=TRUE}
+setwd("~/GitHub/SMU/Doing_Data_Science_1/Homework/Unit 5")
+Girls<-head(final[final$Gender=='F',],10)
+
+write.csv(Girls,"Top 10 girl's names of 2015 and 2016")
+```
+
